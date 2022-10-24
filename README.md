@@ -1,17 +1,5 @@
 # task-4-spring_security
 
-Materials
-Spring Security Architecture
-Securing a Web Application
-Иллюстрированное руководство по OAuth и OpenID Connect
-Spring Boot and OAuth2
-Introduction to JSON Web Tokens
-Tutorial: Create and Verify JWTs in Java
-Simple Token Authentication for Java Apps
-Practice
-Recommended Timeline
-The recommended timeline for the whole module is 2 weeks.
-
 Task
 This module is an extension of REST API Advanced module and covers following topics:
 
