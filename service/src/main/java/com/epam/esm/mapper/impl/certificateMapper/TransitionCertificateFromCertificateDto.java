@@ -1,6 +1,7 @@
 package com.epam.esm.mapper.impl.certificateMapper;
 
-import com.epam.esm.Dto.certificateDto.CertificateDto;
+
+import com.epam.esm.dto.certificateDto.CertificateDto;
 import com.epam.esm.entity.Certificate;
 import com.epam.esm.mapper.Mapper;
 import org.springframework.stereotype.Service;

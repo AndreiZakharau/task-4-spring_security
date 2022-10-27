@@ -1,7 +1,8 @@
 package com.epam.esm.dto.orderDto;
 
-import com.epam.esm.Dto.certificateDto.CertificateDto;
-import com.epam.esm.Dto.userDto.UserDto;
+
+import com.epam.esm.dto.certificateDto.CertificateDto;
+import com.epam.esm.dto.userDto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
