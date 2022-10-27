@@ -17,10 +17,12 @@ import com.epam.esm.service.TagService;
 import com.epam.esm.util.messange.LanguageMassage;
 import com.epam.esm.util.validator.impl.TagsValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,7 +31,6 @@ public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
     private final TagsValidator tagsValidator;
-    private final CertificateServiceImpl certificateServiceImpl;
     private final CertificateRepository certificateRepository;
     private final TransitionReadTagFromTag readMapper;
     private final TransitionTagDtoFromTag tagDtoFromTag;
@@ -40,19 +41,20 @@ public class TagServiceImpl implements TagService {
 
     @Transactional
     @Override
-    public List<ReadTag> getAllEntity(int limit, int offset) {
-//        List<Tag> tags = tagRepository.findAll(limit, offset); //Todo
-//        return readMapper.buildListTag(tags);
-        return null;
+    public Page<ReadTag> getAllEntity(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Tag> tags = tagRepository.findAll(pageable);
+        return tags.map(readMapper::mapFrom);
     }
 
 
-//    @Transactional
-//    @Override
-//    public List<TagDto> getAllTag(int limit, int offset) {
-//        List<Tag> tags = repository.getAllEntity(limit, offset);
-//        return tagDtoFromTag.buildListOnlyTag(tags);
-//    }
+    @Transactional
+    @Override
+    public Page<TagDto> getAllTag(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Tag> tags = tagRepository.findAll(pageable);
+        return tags.map(tagDtoFromTag::mapFrom);
+    }
 
     @Override
     @Transactional
@@ -85,12 +87,6 @@ public class TagServiceImpl implements TagService {
     }
 
 
-//    @Override
-//    @Transactional
-//    public List<TagDto> listTags() {
-//        List<Tag> tags = repository.getTags();
-//        return tagDtoFromTag.buildListOnlyTag(tags);
-//    }
 
     @Override
     @Transactional

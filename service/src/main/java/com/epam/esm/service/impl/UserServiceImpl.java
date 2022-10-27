@@ -20,6 +20,9 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.util.messange.LanguageMassage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,9 +48,10 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public List<ReadUser> getAllEntity(int limit, int offset) {
-//        return readMapper.buildUserModelReadMapper(repository.findAll(limit, offset)); //todo
-        return null;
+    public Page<ReadUser> getAllEntity(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = repository.findAll(pageable);
+        return users.map(readMapper::mapFrom);
     }
 
     @Transactional
