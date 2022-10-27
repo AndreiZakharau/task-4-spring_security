@@ -4,19 +4,22 @@ import com.epam.esm.dto.certificateDto.CertificateDto;
 import com.epam.esm.dto.certificateDto.CreateCertificate;
 import com.epam.esm.dto.certificateDto.ReadCertificate;
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.NoSuchEntityException;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCertificateDto;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCreateCertificate;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromReadCertificate;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionReadCertificateFromCertificate;
+import com.epam.esm.model.SortParamsContext;
 import com.epam.esm.repository.CertificateRepository;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.CertificateService;
 import com.epam.esm.util.messange.LanguageMassage;
 import com.epam.esm.util.validator.impl.CertificateValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,10 +42,10 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     @Transactional
-    public List<ReadCertificate> getAllEntity(int limit, int offset) {
-//        List<Certificate> list = repository.findAll(limit, offset); //Todo
-//        return readMapper.buildListModelCertificates(list);
-        return  null;
+    public Page<ReadCertificate> getAllEntity(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Certificate> list = repository.findAll(pageable);
+        return list.map(readMapper::mapFrom);
 
     }
 
@@ -125,70 +128,23 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
 
-//    @Transactional
-//    public void autoSaveCertificatesTag() {
-//
-//        List<Tag> tagList = tagRepository.getTags();
-//        for (Tag t : tagList) {
-//            List<Certificate> certificateList = repository.getCertificatesByName(t.getTagName());
-//            if (!certificateList.isEmpty()) {
-//                for (Certificate c : certificateList) {
-//                    if (repository.getCertificateAndTag(c, t).isEmpty()) {
-//                        repository.saveCertificatesTag(c.getId(), t.getId());
-//                    }
-//                }
-//            }
-//        }
-//    }
 
-//    @Transactional
-//    public List<ReadCertificate> getCertificatesByTag(String tagName) {
-//        List<Certificate> list;
-//        Optional<Tag> tag = tagRepository.findByTagName(tagName);
-//        if (tag.isEmpty()) {
-//            throw new NoSuchEntityException(languageMassage.getMessage("message.be.empty"));
-//        } else {
-//            list = repository.getCertificatesByName(tagName);
-//        }
-//        return readMapper.buildListModelCertificates(list);
-//    }
 
-//    @Transactional
-//    public List<ReadCertificate> getCertificateByName(String name) {
-//        List<Certificate> list = repository.getCertificatesByName(name);
-//        if (list.isEmpty()) {
-//            throw new NoSuchEntityException(languageMassage.getMessage("message.with.name"));
-//        }
-//        return readMapper.buildListModelCertificates(list);
-//    }
+    @Transactional
+    @Override
+    public Page<ReadCertificate> getCertificateByParameters(
+            String name, List<String> tagNames, String description, List<Double> price,
+            List<String> sortColumns, List<String> orderTypes, int page, int size){
+        SortParamsContext sortParameters = null;
+        if (sortColumns != null) {
+            sortParameters = new SortParamsContext(sortColumns, orderTypes);
+            if(!certificateValidator.columnsValid(sortParameters)) {
+                throw new NoSuchEntityException("bad parameters");
+            }
+        }
+// Todo sort - repository method
 
-//    @Transactional
-//    @Override
-//    public List<ReadCertificate> getCertificatesByTags(List<String> tagNames) {
-//        List<String>list = new ArrayList<>();
-//        for (String name : tagNames){
-//            Optional<Tag> tag = tagRepository.getTagByName(name);
-//            if(tag.isEmpty()){
-//                throw new NoSuchEntityException(languageMassage.getMessage("message.with.name"));
-//            }
-//            list.add(tag.get().getTagName());
-//        }
-//        return readMapper.buildListModelCertificates(repository.getCertificatesByTags(list));
-//    }
-
-//    @Transactional
-//    @Override
-//    public List<ReadCertificate> getCertificateByParameters(
-//            String name, List<String> tagNames, String description, List<Double> price,
-//            List<String> sortColumns, List<String> orderTypes, int offset, int size){
-//        SortParamsContext sortParameters = null;
-//        if (sortColumns != null) {
-//            sortParameters = new SortParamsContext(sortColumns, orderTypes);
-//            if(!certificateValidator.columnsValid(sortParameters)) {
-//                throw new NoSuchEntityException("bad parameters");
-//            }
-//        }
-//
 //        return readMapper.buildListModelCertificates(repository.getCertificateByParameters(name,tagNames,description,price,sortColumns, orderTypes, offset,size));
-//    }
+        return null;
+    }
 }

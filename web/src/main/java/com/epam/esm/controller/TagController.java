@@ -4,8 +4,10 @@ package com.epam.esm.controller;
 import com.epam.esm.dto.tagDto.CreateTag;
 import com.epam.esm.dto.tagDto.ReadTag;
 import com.epam.esm.dto.tagDto.TagDto;
+import com.epam.esm.link.linkImpl.AddTagLink;
 import com.epam.esm.service.impl.TagServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +35,7 @@ public class TagController {
 
     private final TagServiceImpl service;
 
-//    private final AddTagLink tagLink;
+    private final AddTagLink tagLink;
 
     /**
      * Created new tag
@@ -43,7 +47,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.CREATED)
     public CreateTag addTag(@RequestBody CreateTag createTag) {
         service.saveEntity(createTag);
-//        tagLink.addLink(createTag);
+        tagLink.addLink(createTag);
         return createTag;
     }
 
@@ -53,16 +57,16 @@ public class TagController {
      * @param size the size
      * @return List createTag(Dto Tag)
      */
-//    @GetMapping("")
-//    @ResponseStatus(HttpStatus.OK)
-//    public CollectionModel<TagDto> listTags(@RequestParam("page") int page,
-//                                            @RequestParam("size") int size) {
-//        int offset = Pagination.offset(page, size);
-//        TagDto tagDto = new TagDto();
-//        List<TagDto> tags = (service.getAllTag(size, offset));
-//        tagLink.pageLink(page, size,tagDto);
-//        return CollectionModel.of(tags.stream().peek(tagLink::addTadDtoLink).collect(Collectors.toList()), tagDto.getLinks());
-//    }
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    public CollectionModel<TagDto> listTags(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
+                                            @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {
+
+        TagDto tagDto = new TagDto();
+        Page<TagDto> tags = (service.getAllTag(page, size));
+        tagLink.pageLink(tags,tagDto);
+        return CollectionModel.of(tags.stream().peek(tagLink::addTadDtoLink).collect(Collectors.toList()), tagDto.getLinks());
+    }
 
     /**
      * Get readTag(Dto Tag) by id
@@ -74,7 +78,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     public ReadTag getTag(@PathVariable long id) {
         Optional<ReadTag> model = service.findById(id);
-//        tagLink.addLinks(Optional.ofNullable(model).get().orElseThrow());
+        tagLink.addLinks(Optional.ofNullable(model).get().orElseThrow());
         return model.get();
     }
 
@@ -89,7 +93,7 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     public TagDto updateTag(@RequestBody TagDto tag, @PathVariable long id) {
         service.updateEntity(id, tag);
-//        tagLink.addTadDtoLink(tag);
+        tagLink.addTadDtoLink(tag);
         return tag;
     }
 
@@ -97,12 +101,10 @@ public class TagController {
      * delete tag by id
      *
      * @param id the id
-     * @return string response
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTag(@PathVariable long id) {
-        service.deleteEntity(id);
     }
 
     /**
@@ -110,16 +112,16 @@ public class TagController {
      * @param size the size
      * @return list readTag(Dto Tag)
      */
-//    @GetMapping("/all")
-//    @ResponseStatus(HttpStatus.OK)
-//    public CollectionModel<ReadTag> getAllTags(@RequestParam("page") int page,
-//                                               @RequestParam("size") int size) {
-//        int offset = Pagination.offset(page, size);
-//        ReadTag readTag = new ReadTag();
-//        List<ReadTag> list = service.getAllEntity(size, offset);
-//        tagLink.pageLink(page, size,readTag);
-//        return CollectionModel.of(list.stream().peek(tagLink::addLinks).collect(Collectors.toList()), readTag.getLinks());
-//    }
+    @GetMapping("/tags")
+    @ResponseStatus(HttpStatus.OK)
+    public CollectionModel<ReadTag> getAllTags(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
+                                               @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {
+
+        ReadTag readTag = new ReadTag();
+        Page<ReadTag> list = service.getAllEntity(page, size);
+        tagLink.pageLink(list,readTag);
+        return CollectionModel.of(list.stream().peek(tagLink::addLinks).collect(Collectors.toList()), readTag.getLinks());
+    }
 
     /**
      * @return the popular readTag(Dto Tag) from the user
@@ -138,7 +140,7 @@ public class TagController {
     public String addTagToCertificate(@PathVariable long tId,
                                       @PathVariable long cId ) {
         service.addTagToCertificate(tId,cId);
-        return "Tag added to certificate.";
+        return "Tag added to certificate.";//todo ' massage'
     }
 
 

@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.entity.Tag;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +9,7 @@ import java.util.Optional;
 public interface EntityService<T,K,F> {
 
 
-    List<T> getAllEntity(int limit, int offset);
+    Page<T> getAllEntity(int limit, int offset);
 
     void saveEntity(K k);
 

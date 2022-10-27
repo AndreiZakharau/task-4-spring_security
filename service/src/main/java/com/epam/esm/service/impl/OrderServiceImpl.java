@@ -6,11 +6,13 @@ import com.epam.esm.dto.orderDto.ReadOrder;
 import com.epam.esm.entity.Order;
 import com.epam.esm.exception.NoSuchEntityException;
 import com.epam.esm.mapper.impl.orderMapper.TransitionOrderFromCreateOrder;
-import com.epam.esm.mapper.impl.orderMapper.TransitionOrderFromOrderDto;
 import com.epam.esm.mapper.impl.orderMapper.TransitionReadOrderFromOrder;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +26,13 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
     private final TransitionReadOrderFromOrder readOrder;
     private final TransitionOrderFromCreateOrder orderFromCreateOrder;
-    private final TransitionOrderFromOrderDto orderFromOrderDto;
 
     @Override
     @Transactional
-    public List<ReadOrder> getAllEntity(int limit, int offset) {
-//        List<Order>orders = repository.findAll(limit, offset); //Todo
-//        return readOrder.buildReadOrderModel(orders);
-        return null;
+    public Page<ReadOrder> getAllEntity(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Order>orders = repository.findAll(pageable);
+        return orders.map(readOrder::mapFrom);
     }
 
     @Override
@@ -76,13 +77,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public List<ReadOrder> getOrdersByUserId(long userId, int limit, int offset){
-//        List<Order>orders =repository.findOrdersByUserId(userId,limit,offset); //Todo
-//        if(orders.isEmpty()){
-//            throw new NoSuchEntityException("Order from user id " +userId +" is empty."); //Todo
-//
-//        }
-//        return readOrder.buildReadOrderModel(orders);
-        return null;
+    public List<ReadOrder> getOrdersByUserId(long userId){
+//        Pageable pageable = PageRequest.of(page, size);
+        List<Order>orders =repository.getOrdersByUserId(userId);
+        if(orders.isEmpty()){
+            throw new NoSuchEntityException("Order from user id " +userId +" is empty."); //Todo
+
+        }
+        return readOrder.buildReadOrderModel(orders);
     }
 }
