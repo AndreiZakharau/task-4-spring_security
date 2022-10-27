@@ -1,6 +1,6 @@
 package com.epam.esm.mapper.impl.userMapper;
 
-import com.epam.esm.Dto.userDto.UserDto;
+import com.epam.esm.dto.userDto.UserDto;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.Mapper;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TransitionUserDtoFromUser implements Mapper< User,UserDto> {
+public class TransitionUserDtoFromUser implements Mapper< User, UserDto> {
     @Override
     public UserDto mapFrom(User object) {
         return new UserDto(

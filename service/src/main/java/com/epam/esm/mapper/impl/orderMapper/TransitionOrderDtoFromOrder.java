@@ -1,6 +1,7 @@
 package com.epam.esm.mapper.impl.orderMapper;
 
-import com.epam.esm.Dto.orderDto.OrderDto;
+
+import com.epam.esm.dto.orderDto.OrderDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.mapper.Mapper;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateDtoFromCertificate;

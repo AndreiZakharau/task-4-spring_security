@@ -1,6 +1,7 @@
 package com.epam.esm.mapper.impl.tagMapper;
 
-import com.epam.esm.Dto.tagDto.CreateTag;
+
+import com.epam.esm.dto.tagDto.CreateTag;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.Mapper;
 import org.springframework.stereotype.Service;

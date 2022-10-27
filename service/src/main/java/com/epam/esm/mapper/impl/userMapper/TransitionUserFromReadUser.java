@@ -1,6 +1,7 @@
 package com.epam.esm.mapper.impl.userMapper;
 
-import com.epam.esm.Dto.userDto.ReadUser;
+
+import com.epam.esm.dto.userDto.ReadUser;
 import com.epam.esm.entity.User;
 import com.epam.esm.mapper.Mapper;
 import com.epam.esm.mapper.impl.orderMapper.TransitionOrderFromOrderDto;

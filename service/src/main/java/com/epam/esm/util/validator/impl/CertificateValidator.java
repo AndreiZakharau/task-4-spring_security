@@ -1,14 +1,17 @@
 package com.epam.esm.util.validator.impl;
 
 import com.epam.esm.entity.Certificate;
-import com.epam.esm.entity.model.SortParamsContext;
+//import com.epam.esm.entity.model.SortParamsContext;
+import com.epam.esm.model.SortParamsContext;
 import com.epam.esm.util.validator.Validator;
 import org.springframework.stereotype.Component;
 
+//import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+//import java.util.Locale;
 
 @Component("certificateValidator")
 public class CertificateValidator implements Validator<Certificate> {

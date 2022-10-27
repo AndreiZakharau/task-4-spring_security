@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.entity.Tag;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EntityService<T,K,F> {
 
@@ -13,7 +14,7 @@ public interface EntityService<T,K,F> {
 
     void updateEntity(long id, F f);
 
-    T findById(long id);
+    Optional<T> findById(long id);
 
     void deleteEntity(long id);
 
