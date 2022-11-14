@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
@@ -13,7 +15,7 @@ import java.util.Locale;
 
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm.config")
-public class LocaleConfig implements WebMvcConfigurer {
+public class ServiceConfig implements WebMvcConfigurer {
 
     @Bean(name = "messageSource")
     public MessageSource getMessageSource() {
@@ -31,5 +33,10 @@ public class LocaleConfig implements WebMvcConfigurer {
         resolver.setSupportedLocales(Arrays.asList(new Locale("en_US"), new Locale("ru_RU")));
         resolver.setDefaultLocale(Locale.ENGLISH);
         return resolver;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);
     }
 }

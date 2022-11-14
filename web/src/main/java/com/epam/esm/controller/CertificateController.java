@@ -5,12 +5,9 @@ import com.epam.esm.dto.certificateDto.CertificateDto;
 import com.epam.esm.dto.certificateDto.CreateCertificate;
 import com.epam.esm.dto.certificateDto.ReadCertificate;
 import com.epam.esm.link.linkImpl.AddCertificateLink;
-import com.epam.esm.pagination.Pagination;
 import com.epam.esm.service.impl.CertificateServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -132,16 +129,15 @@ public class CertificateController {
     @GetMapping("/sort")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<ReadCertificate> getCertificateByParameters(
-            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "certificateName", required = false) String name,
             @RequestParam(value = "tagName", required = false) List<String> tagNames,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "price", required = false) List<Double> price,
             @RequestParam(value = "sort", required = false) List<String> sortColumns,
             @RequestParam(value = "order", required = false) List<String> orderTypes,
-            @RequestParam(value = "page", defaultValue = "1", required = false) int page,
+            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
             @RequestParam(value = "size", defaultValue = "10", required = false) int size
     ) {
-//        int offset = Pagination.offset(page, size);
         ReadCertificate readCertificate =new ReadCertificate();
         Page<ReadCertificate> list = service.getCertificateByParameters(name, tagNames, description, price,sortColumns,orderTypes, page, size );
         certificateLink.pageLink(list,readCertificate);
