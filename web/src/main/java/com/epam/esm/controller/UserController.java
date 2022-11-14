@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,8 +43,8 @@ public class UserController {
 
     private final UserServiceImpl userService;
 
-    private final OrderRepository rep;
-    private final TransitionReadOrderFromOrder map;
+//    private final OrderRepository orderRepository;
+//    private final TransitionReadOrderFromOrder map;
 
     private final OrderServiceImpl orderService;
     private final AddUserLink userLink;
@@ -67,6 +68,7 @@ public class UserController {
      * @param size the size
      * @return readUser (user Dto)
      */
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<ReadUser> listAllUsers(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
@@ -87,6 +89,7 @@ public class UserController {
      * @return readUser (user Dto)
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
     public Optional<ReadUser> getUserById(@PathVariable long id) {
         Optional<ReadUser> userModel = Optional.ofNullable(userService.findById(id)).get();
@@ -102,6 +105,7 @@ public class UserController {
      * @return the exposed readUser (user Dto)
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
     public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable long id) {
         userService.updateEntity(id, userDto);
@@ -114,6 +118,7 @@ public class UserController {
      * @param id the id
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
         userService.deleteEntity(id);
@@ -126,6 +131,7 @@ public class UserController {
      * @return readUser
      */
     @GetMapping("/name/{name}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
     public ReadUser getUserByName(@PathVariable String name) {
         ReadUser userModel =userService.getUserByName(name);
@@ -134,6 +140,7 @@ public class UserController {
     }
 
     @GetMapping("/orders")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CollectionModel<ReadOrder> getOrders(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
                                                 @RequestParam(value = "size",  defaultValue = "10", required = false) int size){
         ReadOrder readOrder = new ReadOrder();

@@ -20,11 +20,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -131,20 +134,65 @@ public class CertificateServiceImpl implements CertificateService {
 
 
     @Transactional
-    @Override
+    @Override     //TODO sorting not working(working only asc id), bad sorting with only price. If all parameters - ok.
     public Page<ReadCertificate> getCertificateByParameters(
-            String name, List<String> tagNames, String description, List<Double> price,
+            String name, List<String> tagNames, String description, List<Double> prices,
             List<String> sortColumns, List<String> orderTypes, int page, int size){
-        SortParamsContext sortParameters = null;
+        Sort sort = Sort.unsorted();
+        List<String> typesList = Arrays.asList("ASC", "DESC");
+        SortParamsContext sortParameters;
         if (sortColumns != null) {
             sortParameters = new SortParamsContext(sortColumns, orderTypes);
             if(!certificateValidator.columnsValid(sortParameters)) {
-                throw new NoSuchEntityException("bad parameters");
+                throw new NoSuchEntityException("bad parameters"); //todo
             }
-        }
-// Todo sort - repository method
+            List<String> orderTypesList = sortParameters.getOrderTypes();
+            for (String c : sortColumns) {
+                Sort newSort = Sort.by(c);
+                if (orderTypes.stream().anyMatch(order -> typesList.contains(order.toUpperCase(Locale.ROOT)))) {
+                    if(c.equals("DESC")){
+                        newSort.descending();
+                    }else {
+                        newSort.ascending();
+                    }
 
-//        return readMapper.buildListModelCertificates(repository.getCertificateByParameters(name,tagNames,description,price,sortColumns, orderTypes, offset,size));
-        return null;
+                }
+            }
+//            for (int i = 0; i < sortParameters.getSortColumns().size(); i++) {
+//                String sortColumn = sortParameters.getSortColumns().get(i);
+//                Sort newSort = Sort.by(sortColumn);
+//                if (orderTypesList.size() <= i
+//                        || orderTypesList.get(i).equalsIgnoreCase("ASC")) {
+//                    newSort.ascending();
+//                } else {
+//                    newSort.descending();
+//                }
+//                sort.and(newSort);
+//            }
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Certificate> list = null;
+        if (name != null || !name.isEmpty()) {
+            name ="%" + name + "%";
+
+        }
+        if (description != null || !description.isEmpty()) {
+            description = "%" + description + "%";
+        }
+
+        double minPrice = 0;
+        double maxPrice = 0;
+        if (!prices.isEmpty()) {
+            maxPrice = prices.stream().mapToDouble(price -> price)
+                    .max().orElseThrow();
+            minPrice = prices.stream().mapToDouble(price -> price)
+                    .min().orElseThrow();
+
+            list = repository.findAllByCertificateNameLikeAndDescriptionLikeAndPriceBetween(
+                    name, description, minPrice, maxPrice, pageable
+            );
+        }
+
+        return list.map(readMapper::mapFrom);
     }
 }

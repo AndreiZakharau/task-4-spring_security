@@ -1,5 +1,6 @@
 package com.epam.esm.dto.userDto;
 
+import com.epam.esm.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,4 +17,5 @@ public class CreateUser extends RepresentationModel<CreateUser> {
 
     private String nickName;
     private String email;
+    private String password;
 }

@@ -62,6 +62,7 @@ public class Certificate implements Serializable {
         tag.getCertificates().add(this);
     }
 
+    @Builder.Default
     @ToString.Exclude
     @ManyToMany(mappedBy = "certificates", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
