@@ -65,7 +65,6 @@ public class TagServiceImpl implements TagService {
         } else {
             throw new IncorrectDataException("message.not.valid");
         }
-//        certificateServiceImpl.autoSaveCertificatesTag();
     }
 
     @Override
@@ -83,7 +82,6 @@ public class TagServiceImpl implements TagService {
             throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id"));
 
         }
-//        certificateServiceImpl.autoSaveCertificatesTag();
     }
 
 
@@ -114,11 +112,11 @@ public class TagServiceImpl implements TagService {
         }
     }
 
-//    @Transactional
-//    @Override
-//    public ReadTag getPopularTagWithUser() { //Todo
-//        return readMapper.mapFrom(repository.getPopularTagWithUser());
-//    }
+    @Transactional
+    @Override
+    public ReadTag getPopularTagWithUser() { //Todo
+        return readMapper.mapFrom(tagRepository.getPopularTagWithUser());
+    }
 
 
     @Override

@@ -19,7 +19,7 @@ public class AddOrderLink extends AddAbstractLink<ReadOrder> {
         long id = readOrder.getId();
         addIdLink(UserController.class,readOrder,id,SELF_LINK);
         readOrder.add(linkTo(UserController.class)
-                .slash(id)
+                .slash(readOrder.getUser().getId())
                 .slash("users")
                 .withRel("users"));
     }

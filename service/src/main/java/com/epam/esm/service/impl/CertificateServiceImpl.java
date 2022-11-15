@@ -4,11 +4,11 @@ import com.epam.esm.dto.certificateDto.CertificateDto;
 import com.epam.esm.dto.certificateDto.CreateCertificate;
 import com.epam.esm.dto.certificateDto.ReadCertificate;
 import com.epam.esm.entity.Certificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.NoSuchEntityException;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCertificateDto;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCreateCertificate;
-import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromReadCertificate;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionReadCertificateFromCertificate;
 import com.epam.esm.model.SortParamsContext;
 import com.epam.esm.repository.CertificateRepository;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +39,6 @@ public class CertificateServiceImpl implements CertificateService {
     private final CertificateValidator certificateValidator;
     private final TagRepository tagRepository;
     private final TransitionReadCertificateFromCertificate readMapper;
-    private final TransitionCertificateFromReadCertificate certificateFromReadCertificate;
     private final TransitionCertificateFromCertificateDto certificateFromCertificateDto;
     private final TransitionCertificateFromCreateCertificate certificateFromCreateCertificate;
     private final LanguageMassage languageMassage;
@@ -131,68 +131,65 @@ public class CertificateServiceImpl implements CertificateService {
     }
 
 
-
-
     @Transactional
-    @Override     //TODO sorting not working(working only asc id), bad sorting with only price. If all parameters - ok.
+    @Override
     public Page<ReadCertificate> getCertificateByParameters(
-            String name, List<String> tagNames, String description, List<Double> prices,
-            List<String> sortColumns, List<String> orderTypes, int page, int size){
-        Sort sort = Sort.unsorted();
-        List<String> typesList = Arrays.asList("ASC", "DESC");
-        SortParamsContext sortParameters;
-        if (sortColumns != null) {
-            sortParameters = new SortParamsContext(sortColumns, orderTypes);
-            if(!certificateValidator.columnsValid(sortParameters)) {
-                throw new NoSuchEntityException("bad parameters"); //todo
-            }
-            List<String> orderTypesList = sortParameters.getOrderTypes();
-            for (String c : sortColumns) {
-                Sort newSort = Sort.by(c);
-                if (orderTypes.stream().anyMatch(order -> typesList.contains(order.toUpperCase(Locale.ROOT)))) {
-                    if(c.equals("DESC")){
-                        newSort.descending();
-                    }else {
-                        newSort.ascending();
-                    }
+            String certificateName, List<String> tagNames, String description, List<Double> prices,
+            List<String> sortColumns, List<String> orderTypes, int page, int size) {
 
+        List<String> typesList = Arrays.asList("ASC", "DESC");
+        Sort sort = null;
+        SortParamsContext sortParameters;
+        if (sortColumns != null || !sortColumns.isEmpty()) {
+            sortParameters = new SortParamsContext(sortColumns, orderTypes);
+
+            if (!certificateValidator.columnsValid(sortParameters)) {
+                throw new NoSuchEntityException("bad parameters"); //todo
+            } else {
+                List<String> orderTypesList = sortParameters.getOrderTypes();
+                for (String column : sortColumns) {
+                    sort = Sort.by(column);
+                    if (orderTypes.size() > 0 && orderTypes.stream().anyMatch(order -> typesList.contains(order.toUpperCase(Locale.ROOT)))) {
+                        if (orderTypes.get(0).toUpperCase(Locale.ROOT).equals("DESC")) {
+                            sort = Sort.by(column).descending();
+                        } else {
+                            sort = Sort.by(column).ascending();
+                        }
+                    }
                 }
             }
-//            for (int i = 0; i < sortParameters.getSortColumns().size(); i++) {
-//                String sortColumn = sortParameters.getSortColumns().get(i);
-//                Sort newSort = Sort.by(sortColumn);
-//                if (orderTypesList.size() <= i
-//                        || orderTypesList.get(i).equalsIgnoreCase("ASC")) {
-//                    newSort.ascending();
-//                } else {
-//                    newSort.descending();
-//                }
-//                sort.and(newSort);
-//            }
         }
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Certificate> list = null;
-        if (name != null || !name.isEmpty()) {
-            name ="%" + name + "%";
 
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (certificateName != null) {
+            certificateName = "%" + certificateName + "%";
         }
-        if (description != null || !description.isEmpty()) {
+        if (description != null) {
             description = "%" + description + "%";
+        }
+        List<Tag> tags = new ArrayList<>();
+        if (!tagNames.isEmpty()) {
+            for (String name : tagNames) {
+                Tag tag = tagRepository.findByTagName(name).orElseThrow();
+                tags.add(tag);
+            }
         }
 
         double minPrice = 0;
         double maxPrice = 0;
-        if (!prices.isEmpty()) {
+        if (prices != null) {
             maxPrice = prices.stream().mapToDouble(price -> price)
                     .max().orElseThrow();
             minPrice = prices.stream().mapToDouble(price -> price)
                     .min().orElseThrow();
-
-            list = repository.findAllByCertificateNameLikeAndDescriptionLikeAndPriceBetween(
-                    name, description, minPrice, maxPrice, pageable
-            );
         }
+
+        Page<Certificate> list = repository.findAllDistinctByCertificateNameLikeOrDescriptionLikeOrPriceBetweenOrTagsIn(
+                certificateName, description, minPrice, maxPrice, tags, pageable);
 
         return list.map(readMapper::mapFrom);
     }
+
 }
+

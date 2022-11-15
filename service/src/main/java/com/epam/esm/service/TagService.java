@@ -12,5 +12,8 @@ public interface TagService extends EntityService<ReadTag, CreateTag, TagDto> {
     Page<TagDto> getAllTag(int page, int size);
 
     @Transactional
+    ReadTag getPopularTagWithUser();
+
+    @Transactional
     void addTagToCertificate(long tId, long cId);
 }

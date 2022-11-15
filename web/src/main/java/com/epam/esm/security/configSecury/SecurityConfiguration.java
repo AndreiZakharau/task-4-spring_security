@@ -52,17 +52,14 @@ public class SecurityConfiguration {
 
             @Override
             public void put(Object key, Object value) {
-
             }
 
             @Override
             public void addInvalidationListener(Consumer listener) {
-
             }
 
             @Override
             public void close() {
-
             }
         };
     }
