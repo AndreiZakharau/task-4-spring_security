@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,6 +43,7 @@ public class CertificateController {
      * @return new createCertificate (certificate Dto)
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateCertificate addCertificate(@RequestBody CreateCertificate certificate) {
         service.saveEntity(certificate);
@@ -94,6 +96,7 @@ public class CertificateController {
      * @return updated ReadCertificate (certificate Dto)
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public CertificateDto updateCertificate(@RequestBody CertificateDto certificate, @PathVariable long id) {
         service.updateEntity(id, certificate);
@@ -108,6 +111,7 @@ public class CertificateController {
      * @return string response
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCertificate(@PathVariable long id) {
         service.deleteEntity(id);
@@ -116,7 +120,7 @@ public class CertificateController {
 
 
     /**
-     * @param name the certificate name
+     * @param certificateName the certificate name
      * @param tagNames the certificate tagNames
      * @param description the certificate description
      * @param price the certificate price
@@ -129,17 +133,17 @@ public class CertificateController {
     @GetMapping("/sort")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<ReadCertificate> getCertificateByParameters(
-            @RequestParam(value = "certificateName", required = false) String name,
-            @RequestParam(value = "tagName", required = false) List<String> tagNames,
+            @RequestParam(value = "certificateName",required = false) String certificateName,
+            @RequestParam(value = "tagName",defaultValue = "", required = false) List<String> tagNames,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "price", required = false) List<Double> price,
-            @RequestParam(value = "sort", required = false) List<String> sortColumns,
-            @RequestParam(value = "order", required = false) List<String> orderTypes,
+            @RequestParam(value = "sort",  defaultValue = "id" ,required = false) List<String> sortColumns,
+            @RequestParam(value = "order" ,defaultValue = "asc" ,required = false) List<String> orderTypes,
             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
             @RequestParam(value = "size", defaultValue = "10", required = false) int size
     ) {
-        ReadCertificate readCertificate =new ReadCertificate();
-        Page<ReadCertificate> list = service.getCertificateByParameters(name, tagNames, description, price,sortColumns,orderTypes, page, size );
+        ReadCertificate readCertificate = new ReadCertificate();
+        Page<ReadCertificate> list = service.getCertificateByParameters(certificateName, tagNames, description, price,sortColumns,orderTypes, page, size );
         certificateLink.pageLink(list,readCertificate);
         return CollectionModel.of(list.stream()
                 .peek(certificateLink::addLinks)

@@ -155,6 +155,7 @@ public class UserController {
      * @return OrderModel
      */
     @PostMapping("/orders")
+    @PreAuthorize("hasAuthority('USER')")
     public CreateOrder purchaseCertificate(@RequestParam long userId, @RequestParam long certificateId) {
         return userService.purchaseCertificate(userId, certificateId);
     }
@@ -166,9 +167,10 @@ public class UserController {
      * @return readOrder (order Dto)
      */
     @GetMapping("{id}/orders")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK) //Todo bad link
     public CollectionModel<ReadOrder> getOrderByUserId(@PathVariable long id){
-//                                            @RequestParam(value = "page", defaultValue = "1", required = false) int page,
+//                                            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
 //                                            @RequestParam(value = "size",  defaultValue = "10", required = false) int size) {
 
 //        ReadOrder readOrder = new ReadOrder();
@@ -185,6 +187,7 @@ public class UserController {
      * @param id the id
      */
     @DeleteMapping("{}/orders/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOrder(@PathVariable long id) {
         orderService.deleteEntity(id);

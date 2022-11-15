@@ -30,7 +30,7 @@ public class AddCertificateLink extends AddAbstractLink<ReadCertificate> {
         addIdLinks(CertificateController.class,readCertificate,id,SELF_LINK,UPDATE_LINK,DELETE_LINK);
         if(readCertificate.getTags()!=null){
             for (TagDto tagDto : readCertificate.getTags()) {
-                tagDto.add(linkTo(TagController.class).slash(id).withRel("tag"));
+                tagDto.add(linkTo(TagController.class).slash(tagDto.getId()).withRel("tag"));
             }
         }
     }

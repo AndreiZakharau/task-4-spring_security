@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,12 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.http.HttpResponse;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1.1/tags")
 @RequiredArgsConstructor
 public class TagController {
-
 
     private final TagServiceImpl service;
 
@@ -44,6 +41,7 @@ public class TagController {
      * @return new createTag(Dto)
      */
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateTag addTag(@RequestBody CreateTag createTag) {
         service.saveEntity(createTag);
@@ -57,7 +55,7 @@ public class TagController {
      * @param size the size
      * @return List createTag(Dto Tag)
      */
-    @GetMapping("")
+    @GetMapping("/tags")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<TagDto> listTags(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
                                             @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {
@@ -90,6 +88,7 @@ public class TagController {
      * @return the exposed readTag(Dto Tag)
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public TagDto updateTag(@RequestBody TagDto tag, @PathVariable long id) {
         service.updateEntity(id, tag);
@@ -103,6 +102,7 @@ public class TagController {
      * @param id the id
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTag(@PathVariable long id) {
     }
@@ -112,7 +112,7 @@ public class TagController {
      * @param size the size
      * @return list readTag(Dto Tag)
      */
-    @GetMapping("/tags")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<ReadTag> getAllTags(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
                                                @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {
@@ -127,15 +127,21 @@ public class TagController {
      * @return the popular readTag(Dto Tag) from the user
      * with the maximum sum of all order
      */
-//    @GetMapping("/popular")
-//    @ResponseStatus(HttpStatus.OK)
-//    public ReadTag getPopularTagWithUser() {
-//        ReadTag tag = service.getPopularTagWithUser();
-//        tagLink.addLinks(tag);
-//        return  tag;
-//    }
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public ReadTag getPopularTagWithUser() {
+        ReadTag tag = service.getPopularTagWithUser();
+        tagLink.addLinks(tag);
+        return  tag;
+    }
 
+    /**
+     * @param tId the tagId
+     * @param cId the certificateId
+     * @return string message
+     */
     @PostMapping("/{tId}/certificates/{cId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public String addTagToCertificate(@PathVariable long tId,
                                       @PathVariable long cId ) {

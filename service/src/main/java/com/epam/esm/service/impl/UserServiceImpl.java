@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final TransitionUserFromUserDto userFromUserDto;
     private final TransitionUserDtoFromUser userDtoFromUser;
     private final TransitionUserFromCreateUser userFromCreateUser;
-    private final TransitionCreateUserFromUser createUserFromUser;
+
     private final TransitionCertificateDtoFromCertificate certificateDtoFromCertificate;
     private final LanguageMassage languageMassage;
 
