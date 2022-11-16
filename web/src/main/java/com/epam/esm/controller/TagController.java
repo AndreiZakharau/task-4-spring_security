@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1.1/tags")
+@RequestMapping("/tags")
 @RequiredArgsConstructor
 public class TagController {
 

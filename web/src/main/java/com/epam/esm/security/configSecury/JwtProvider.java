@@ -22,14 +22,13 @@ public class JwtProvider {
     private String secretKeyAccess;
     @Value("${jwt.secret.refresh}")
     private String secretKeyRefresh;
-    @Value("${jwt.expiration.access}")
-    private long accessTime;
-    @Value("${jwt.expiration.refresh}")
-    private long refreshTime;
+    @Value("${jwt.expiration}")
+    private long expirationTime;
+
 
     public String generateAccessToken(@NonNull User user) {
         LocalDateTime now = LocalDateTime.now();
-        Instant accessExpirationInstant = now.plusMinutes(accessTime).atZone(ZoneId.systemDefault()).toInstant();
+        Instant accessExpirationInstant = now.plusMinutes(expirationTime).atZone(ZoneId.systemDefault()).toInstant();
         Date accessExpiration = Date.from(accessExpirationInstant);
         return Jwts.builder()
                 .setSubject(user.getNickName())
@@ -42,7 +41,7 @@ public class JwtProvider {
 
     public String generateRefreshToken(@NonNull User user) {
         LocalDateTime now = LocalDateTime.now();
-        Instant refreshExpirationInstant = now.plusDays(refreshTime).atZone(ZoneId.systemDefault()).toInstant();
+        Instant refreshExpirationInstant = now.plusDays(expirationTime).atZone(ZoneId.systemDefault()).toInstant();
         Date refreshExpiration = Date.from(refreshExpirationInstant);
         return Jwts.builder()
                 .setSubject(user.getNickName())

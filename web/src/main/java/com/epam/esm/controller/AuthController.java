@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.security.auth.message.AuthException;
 
 @RestController
-@RequestMapping("/api/v1.1/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

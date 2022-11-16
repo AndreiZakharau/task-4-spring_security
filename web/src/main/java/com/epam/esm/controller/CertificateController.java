@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1.1/certificates")
+@RequestMapping("/certificates")
 public class CertificateController {
 
     private final CertificateServiceImpl service;

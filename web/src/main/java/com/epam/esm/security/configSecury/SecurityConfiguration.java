@@ -31,9 +31,9 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeHttpRequests(
                         auth -> auth
-                                .antMatchers("/api/v1.1/auth/login", "/api/v1.1/auth/token", "/api/v1.1/auth/refresh").permitAll()
-                                .antMatchers(HttpMethod.POST, "/api/v1.1/users").permitAll()
-                                .antMatchers(HttpMethod.GET, "/api/v1.1/certificates/**","/api/v1.1/tags/**").permitAll()
+                                .antMatchers("/auth/login", "/auth/token", "/auth/refresh").permitAll()
+                                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                                .antMatchers(HttpMethod.GET, "/certificates/**","/tags/**").permitAll()
                                 .anyRequest()
                                 .authenticated()
                                 .and()
