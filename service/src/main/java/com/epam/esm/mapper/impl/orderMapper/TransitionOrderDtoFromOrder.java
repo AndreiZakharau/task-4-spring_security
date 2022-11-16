@@ -6,13 +6,14 @@ import com.epam.esm.entity.Order;
 import com.epam.esm.mapper.Mapper;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateDtoFromCertificate;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TransitionOrderDtoFromOrder implements Mapper<Order, OrderDto> {
 
     private final TransitionCertificateDtoFromCertificate certificateMapper;
