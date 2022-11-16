@@ -114,7 +114,7 @@ public class TagServiceImpl implements TagService {
 
     @Transactional
     @Override
-    public ReadTag getPopularTagWithUser() { //Todo
+    public ReadTag getPopularTagWithUser() {
         return readMapper.mapFrom(tagRepository.getPopularTagWithUser());
     }
 
