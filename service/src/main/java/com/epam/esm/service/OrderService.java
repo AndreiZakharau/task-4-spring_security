@@ -12,5 +12,6 @@ import java.util.List;
 
 public interface OrderService extends EntityService<ReadOrder, CreateOrder, OrderDto>{
 
-    List<ReadOrder> getOrdersByUserId(long userId);
+    @Transactional
+    Page<ReadOrder> getOrdersByUserId(long userId, int page, int size);
 }

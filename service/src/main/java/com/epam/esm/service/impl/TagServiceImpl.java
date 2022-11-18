@@ -69,19 +69,20 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public void updateEntity(long id, TagDto tagDto) {
+    public TagDto updateEntity(long id, TagDto tagDto) {
         Optional<Tag> tag = tagRepository.findById(id);
+        Tag tag1;
         if (tag.isPresent()) {
             tag.get().setTagName(tagDto.getTagName());
             if (tagsValidator.isValidModel(tagFromTagDto.mapFrom(tagDto))) {
-                tagRepository.saveAndFlush(tag.get());
+             tag1 = tagRepository.saveAndFlush(tag.get());
             } else {
                 throw new IncorrectDataException(languageMassage.getMessage("message.not.valid"));
             }
         } else {
             throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id"));
-
         }
+        return tagDtoFromTag.mapFrom(tag1);
     }
 
 

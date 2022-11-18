@@ -19,6 +19,7 @@ public class JwtAuthentication implements Authentication {
     private boolean authenticated;
     private String username;
     private String email;
+    private Long id;
     private String password;
     private Set<Role> roles;
 
@@ -57,6 +58,7 @@ public class JwtAuthentication implements Authentication {
     public String getName() {
         return email;
     }
+
 
     @Override
     public boolean implies(Subject subject) {

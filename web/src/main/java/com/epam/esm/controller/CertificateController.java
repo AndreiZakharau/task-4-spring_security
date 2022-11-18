@@ -108,7 +108,7 @@ public class CertificateController {
      * delete certificate by id
      *
      * @param id the id
-     * @return string response
+     * @return HttpStatus
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

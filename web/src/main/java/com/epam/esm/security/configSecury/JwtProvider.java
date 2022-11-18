@@ -36,6 +36,7 @@ public class JwtProvider {
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKeyAccess)))
                 .claim("roles", user.getRole())
                 .claim("username", user.getNickName())
+                .claim("id", user.getId())
                 .compact();
     }
 

@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,12 +42,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateEntity(long id, OrderDto orderDto) {
+    public OrderDto updateEntity(long id, OrderDto orderDto) {
 //        if(repository.findById(id).isPresent()){
 //            repository.save(orderFromOrderDto.mapFrom(orderDto));
 //        } else {
 //            throw new NoSuchEntityException("Order from id " +id +"is empty");
 //        }
+        return null;
     }
 
     @Override
@@ -77,13 +77,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public List<ReadOrder> getOrdersByUserId(long userId){
-//        Pageable pageable = PageRequest.of(page, size);
-        List<Order>orders =repository.getOrdersByUserId(userId);
+    public Page<ReadOrder> getOrdersByUserId(long userId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Order>orders =repository.findOrdersByUserId(userId,pageable);
         if(orders.isEmpty()){
             throw new NoSuchEntityException("Order from user id " +userId +" is empty."); //Todo
 
         }
-        return readOrder.buildReadOrderModel(orders);
+        return orders.map(readOrder::mapFrom);
     }
 }

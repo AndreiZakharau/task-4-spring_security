@@ -55,7 +55,7 @@ public class TagController {
      * @param size the size
      * @return List createTag(Dto Tag)
      */
-    @GetMapping("/tags")
+    @GetMapping("/certificates")
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<TagDto> listTags(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
                                             @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {

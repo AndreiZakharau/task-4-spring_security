@@ -53,9 +53,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final TransitionUserFromUserDto userFromUserDto;
     private final TransitionUserDtoFromUser userDtoFromUser;
     private final TransitionUserFromCreateUser userFromCreateUser;
-
     private final TransitionCertificateDtoFromCertificate certificateDtoFromCertificate;
     private final LanguageMassage languageMassage;
+
 
     @Transactional
     @Override
@@ -87,19 +87,28 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Transactional
     @Override
-    public void updateEntity(long id, UserDto userDto) {
+    public UserDto updateEntity(long id, UserDto userDto) {
         User user = userFromUserDto.mapFrom(userDto);
+        User newUser;
         Optional<User> user1 = repository.findById(id);
         if (user1.isPresent()) {
             user.setId(id);
-            if (user.getNickName() == null)
+            if (user.getNickName() == null) {
                 user.setNickName(user1.get().getNickName());
-            if (user.getEmail() == null)
+            }
+            if (user.getEmail() == null) {
                 user.setEmail(user1.get().getEmail());
-            repository.save(user);
+            }
+            if (user.getPassword() == null) {
+                user.setPassword(user1.get().getPassword());
+            }
+
+            user.setRole(user1.get().getRole());
+            newUser = repository.save(user);
         } else {
             throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id"));
         }
+        return userDtoFromUser.mapFrom(newUser);
     }
 
     @Transactional
@@ -135,11 +144,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = repository.findUserByNickName(name);
         return readMapper.mapFrom(user);
     }
+
     @Transactional
     @Override
     public User findByName(String name) {
-        User user = repository.findUserByNickName(name);
-        return user;
+        return repository.findUserByNickName(name);
+
     }
 
 
@@ -173,4 +183,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getNickName(), user.getPassword(), Arrays.asList(authority));
     }
+
 }

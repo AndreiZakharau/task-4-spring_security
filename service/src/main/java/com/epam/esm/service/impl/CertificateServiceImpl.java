@@ -7,6 +7,7 @@ import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.NoSuchEntityException;
+import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateDtoFromCertificate;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCertificateDto;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateFromCreateCertificate;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionReadCertificateFromCertificate;
@@ -41,6 +42,8 @@ public class CertificateServiceImpl implements CertificateService {
     private final TransitionReadCertificateFromCertificate readMapper;
     private final TransitionCertificateFromCertificateDto certificateFromCertificateDto;
     private final TransitionCertificateFromCreateCertificate certificateFromCreateCertificate;
+
+    private final TransitionCertificateDtoFromCertificate certificateDtoFromCertificate;
     private final LanguageMassage languageMassage;
 
     @Override
@@ -71,8 +74,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     @Transactional
-    public void updateEntity(long id, CertificateDto certificateDto) {
+    public CertificateDto updateEntity(long id, CertificateDto certificateDto) {
         Optional<Certificate> c = repository.findById(id);
+        Certificate certificate1;
         if (c.isPresent()) {
             certificateDto.setId(id);
             if (certificateDto.getCertificateName() == null)
@@ -94,13 +98,14 @@ public class CertificateServiceImpl implements CertificateService {
             Certificate certificate = certificateFromCertificateDto.mapFrom(certificateDto);
 
             if (certificateValidator.isValid(certificate)) {
-                repository.save(certificate);
+                certificate1 = repository.save(certificate);
             } else {
                 throw new IncorrectDataException(languageMassage.getMessage("message.not.valid"));
             }
         } else {
             throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id"));
         }
+        return certificateDtoFromCertificate.mapFrom(certificate1);
     }
 
     @Override

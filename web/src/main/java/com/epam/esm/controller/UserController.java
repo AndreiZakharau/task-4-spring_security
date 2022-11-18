@@ -7,19 +7,27 @@ import com.epam.esm.dto.userDto.CreateUser;
 import com.epam.esm.dto.userDto.ReadUser;
 import com.epam.esm.dto.userDto.UserDto;
 import com.epam.esm.entity.Order;
+import com.epam.esm.entity.Role;
+import com.epam.esm.entity.User;
+import com.epam.esm.exception.NoSuchEntityException;
 import com.epam.esm.link.linkImpl.AddOrderLink;
 import com.epam.esm.link.linkImpl.AddUserLink;
 import com.epam.esm.mapper.impl.orderMapper.TransitionReadOrderFromOrder;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.UserRepository;
+import com.epam.esm.security.configSecury.JwtAuthentication;
+import com.epam.esm.security.filter.IsValidUser;
 import com.epam.esm.service.impl.OrderServiceImpl;
 import com.epam.esm.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.auth.message.AuthException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,13 +51,10 @@ public class UserController {
 
 
     private final UserServiceImpl userService;
-
-//    private final OrderRepository orderRepository;
-//    private final TransitionReadOrderFromOrder map;
-
     private final OrderServiceImpl orderService;
     private final AddUserLink userLink;
     private final AddOrderLink orderLink;
+    private final IsValidUser validUser;
 
     /**
      * Created new user
@@ -71,14 +77,14 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<ReadUser> listAllUsers(@RequestParam(value = "page",defaultValue = "0", required = false) Integer page,
-                                                  @RequestParam(value = "size",defaultValue = "10", required = false) Integer size) {
+    public CollectionModel<ReadUser> listAllUsers(@RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
+                                                  @RequestParam(value = "size", defaultValue = "10", required = false) Integer size) {
 
         ReadUser readUser = new ReadUser();
         Page<ReadUser> models = userService.getAllEntity(page, size);
-        userLink.pageLink(models,readUser);
+        userLink.pageLink(models, readUser);
         return CollectionModel.of(models.stream().peek(userLink::addLinks)
-                .collect(Collectors.toList()),
+                        .collect(Collectors.toList()),
                 readUser.getLinks());
     }
 
@@ -91,25 +97,34 @@ public class UserController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<ReadUser> getUserById(@PathVariable long id) {
-        Optional<ReadUser> userModel = Optional.ofNullable(userService.findById(id)).get();
-        userLink.addLinks(userModel.get());
-        return userModel;
+    public ReadUser getUserById(@PathVariable long id) {
+        if (validUser.isValidId(id)) {
+            Optional<ReadUser> userModel = Optional.ofNullable(userService.findById(id)).get();
+            userLink.addLinks(userModel.get());
+            return userModel.get();
+        } else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
     }
 
     /**
      * update userDto by id
      *
      * @param userDto the user Dto
-     * @param id   the id
+     * @param id      the id
      * @return the exposed readUser (user Dto)
      */
+
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
     public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable long id) {
-        userService.updateEntity(id, userDto);
-        return userDto;
+
+        if (validUser.isValidId(id)) {
+            return userService.updateEntity(id, userDto);
+        } else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
     }
 
     /**
@@ -121,7 +136,11 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable long id) {
-        userService.deleteEntity(id);
+        if (validUser.isValidId(id)) {
+            userService.deleteEntity(id);
+        } else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
     }
 
     /**
@@ -130,34 +149,44 @@ public class UserController {
      * @param name the name
      * @return readUser
      */
-    @GetMapping("/name/{name}")
+    @GetMapping("/{name}/name")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK)
     public ReadUser getUserByName(@PathVariable String name) {
-        ReadUser userModel =userService.getUserByName(name);
-        userLink.addLinks(userModel);
-        return userModel;
+        if (validUser.isValidName(name)) {
+            ReadUser userModel = userService.getUserByName(name);
+            userLink.addLinks(userModel);
+            return userModel;
+        }else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
     }
 
     @GetMapping("/orders")
     @PreAuthorize("hasAuthority('ADMIN')")
     public CollectionModel<ReadOrder> getOrders(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
-                                                @RequestParam(value = "size",  defaultValue = "10", required = false) int size){
+                                                @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
         ReadOrder readOrder = new ReadOrder();
         Page<ReadOrder> models = orderService.getAllEntity(page, size);
-        orderLink.pageLink(models,readOrder);
+        orderLink.pageLink(models, readOrder);
         return CollectionModel.of(models.stream().peek(orderLink::addLinks).collect(Collectors.toList()), readOrder.getLinks());
     }
 
     /**
-     * @param userId        the userID
+     * @param id            the userID
      * @param certificateId the CertificateId
      * @return OrderModel
      */
-    @PostMapping("/orders")
-    @PreAuthorize("hasAuthority('USER')")
-    public CreateOrder purchaseCertificate(@RequestParam long userId, @RequestParam long certificateId) {
-        return userService.purchaseCertificate(userId, certificateId);
+    @PostMapping("{id}/orders")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreateOrder purchaseCertificate(@PathVariable long id, @RequestParam long certificateId) {
+        if (validUser.isValidId(id)) {
+            return userService.purchaseCertificate(id, certificateId);
+        } else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
+
     }
 
     /**
@@ -169,17 +198,19 @@ public class UserController {
     @GetMapping("{id}/orders")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @ResponseStatus(HttpStatus.OK) //Todo bad link
-    public CollectionModel<ReadOrder> getOrderByUserId(@PathVariable long id){
-//                                            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
-//                                            @RequestParam(value = "size",  defaultValue = "10", required = false) int size) {
+    public CollectionModel<ReadOrder> getOrderByUserId(@PathVariable long id,
+                                                       @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+                                                       @RequestParam(value = "size", defaultValue = "10", required = false) int size) {
 
-//        ReadOrder readOrder = new ReadOrder();
-        List<ReadOrder> orders = (orderService.getOrdersByUserId(id));
-//        orderLink.pageLink(orders);
-        return CollectionModel.of(orders.stream().peek(orderLink::addLinks).collect(Collectors.toList()));
+        if (validUser.isValidId(id)) {
+            ReadOrder readOrder = new ReadOrder();
+            Page<ReadOrder> orders = (orderService.getOrdersByUserId(id, page, size));
+            orderLink.pageLink(orders, readOrder);
+            return CollectionModel.of(orders.stream().peek(orderLink::addLinks).collect(Collectors.toList()));
+        } else {
+            throw new NoSuchEntityException("Net prav dostupa"); //todo message
+        }
     }
-
-
 
     /**
      * delete orderDto by id

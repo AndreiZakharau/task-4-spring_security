@@ -13,7 +13,7 @@ public interface EntityService<T,K,F> {
 
     void saveEntity(K k);
 
-    void updateEntity(long id, F f);
+    F updateEntity(long id, F f);
 
     Optional<T> findById(long id);
 
