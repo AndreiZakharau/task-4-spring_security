@@ -9,6 +9,7 @@ import com.epam.esm.mapper.impl.orderMapper.TransitionOrderFromCreateOrder;
 import com.epam.esm.mapper.impl.orderMapper.TransitionReadOrderFromOrder;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.service.OrderService;
+import com.epam.esm.util.messange.LanguageMassage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
     private final TransitionReadOrderFromOrder readOrder;
     private final TransitionOrderFromCreateOrder orderFromCreateOrder;
+    private final LanguageMassage languageMassage;
 
     @Override
     @Transactional
@@ -46,7 +48,8 @@ public class OrderServiceImpl implements OrderService {
 //        if(repository.findById(id).isPresent()){
 //            repository.save(orderFromOrderDto.mapFrom(orderDto));
 //        } else {
-//            throw new NoSuchEntityException("Order from id " +id +"is empty");
+//            throw new NoSuchEntityException(languageMassage.getMessage("massage.order.with.id ") +userId +
+//                    languageMassage.getMessage("message.does.not"));
 //        }
         return null;
     }
@@ -56,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
     public Optional<ReadOrder> findById(long userId) {
         Optional<Order>order =repository.findById(userId);
         if(order.isEmpty())
-            throw new NoSuchEntityException("Order from  id " +userId +" is empty."); //Todo
+            throw new NoSuchEntityException(languageMassage.getMessage("message.order.with.id") +userId +
+                    languageMassage.getMessage("message.does.not"));
         return order.map(readOrder::mapFrom);
     }
 
@@ -66,7 +70,8 @@ public class OrderServiceImpl implements OrderService {
         if(repository.findById(id).isPresent()){
             repository.deleteById(id);
         }
-        throw new NoSuchEntityException("Order from id " +id +" is empty."); //Todo
+        throw new NoSuchEntityException(languageMassage.getMessage("message.order.with.id") + id +
+                languageMassage.getMessage("message.does.not"));
     }
 
     @Override
@@ -81,8 +86,8 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Order>orders =repository.findOrdersByUserId(userId,pageable);
         if(orders.isEmpty()){
-            throw new NoSuchEntityException("Order from user id " +userId +" is empty."); //Todo
-
+            throw new NoSuchEntityException(languageMassage.getMessage("message.order.with.id") +userId +
+                    languageMassage.getMessage("message.does.not"));
         }
         return orders.map(readOrder::mapFrom);
     }

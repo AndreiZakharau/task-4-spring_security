@@ -11,7 +11,6 @@ import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.NoSuchEntityException;
 import com.epam.esm.mapper.impl.certificateMapper.TransitionCertificateDtoFromCertificate;
 import com.epam.esm.mapper.impl.orderMapper.TransitionOrderFromCreateOrder;
-import com.epam.esm.mapper.impl.userMapper.TransitionCreateUserFromUser;
 import com.epam.esm.mapper.impl.userMapper.TransitionReadUserFromUser;
 import com.epam.esm.mapper.impl.userMapper.TransitionUserDtoFromUser;
 import com.epam.esm.mapper.impl.userMapper.TransitionUserFromCreateUser;
@@ -80,7 +79,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             }
 
         } else {
-            throw new IncorrectDataException(languageMassage.getMessage("not correct data")); //ToDo
+            throw new IncorrectDataException(languageMassage.getMessage("message.incorrect.data"));
         }
 
     }
@@ -106,7 +105,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setRole(user1.get().getRole());
             newUser = repository.save(user);
         } else {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return userDtoFromUser.mapFrom(newUser);
     }
@@ -116,7 +116,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Optional<ReadUser> findById(long id) {
         Optional<User> user = Optional.of(repository.findById(id)).orElseThrow();
         if (user.isEmpty()) {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return user.map(readMapper::mapFrom);
     }
@@ -126,7 +127,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void deleteEntity(long id) {
         Optional<User> user = repository.findById(id);
         if (user.isEmpty()) {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.user.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         } else {
             repository.deleteById(id);
         }
@@ -177,7 +179,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         User user = repository.findUserByNickName(username);
         if (user == null) {
-            throw new UsernameNotFoundException("user not found!"); //todo
+            throw new UsernameNotFoundException(languageMassage.getMessage("message.user.with.name") + username +
+                    languageMassage.getMessage("message.does.not"));
         }
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
         return new org.springframework.security.core.userdetails.User(

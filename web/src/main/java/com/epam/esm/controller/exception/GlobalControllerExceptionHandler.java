@@ -1,8 +1,10 @@
 package com.epam.esm.controller.exception;
 
+import com.epam.esm.exception.AuthDateException;
 import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.ModelException;
 import com.epam.esm.exception.NoSuchEntityException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.security.auth.message.AuthException;
 import java.util.Locale;
 
 @RestControllerAdvice()
@@ -43,7 +46,13 @@ public class GlobalControllerExceptionHandler {
         return buildResponse(resolverBundle(exception.getMessage(),
                 locale), 404666, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(AuthDateException.class)
+    public ResponseEntity<ModelException> handlerExceptionBadDate
+            (AuthDateException exception, Locale locale) {
+        return buildResponse(resolverBundle(exception.getMessage(),
+                locale), 403666, HttpStatus.FORBIDDEN);
 
+    }
     @ExceptionHandler(IncorrectDataException.class)
     public ResponseEntity<ModelException> handlerExceptionBadRequest
             (IncorrectDataException exception, Locale locale) {
@@ -55,7 +64,7 @@ public class GlobalControllerExceptionHandler {
     public ResponseEntity<ModelException> handlerException
             (Exception exception, Locale locale) {
         return buildResponse(resolverBundle(exception.getMessage(),
-                locale), 599999, HttpStatus.ALREADY_REPORTED);
+                locale), 599999, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -64,6 +73,7 @@ public class GlobalControllerExceptionHandler {
         return buildResponse(e.getMessage(), 400222,
                 HttpStatus.BAD_REQUEST);
     }
+
 
     @ExceptionHandler(TypeMismatchException.class)
     public ResponseEntity<ModelException> handlerException

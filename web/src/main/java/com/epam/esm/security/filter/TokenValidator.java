@@ -1,5 +1,6 @@
 package com.epam.esm.security.filter;
 
+import com.epam.esm.exception.AuthDateException;
 import com.epam.esm.exception.NoSuchEntityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -26,9 +27,10 @@ public class TokenValidator {
                     .parseClaimsJws(token);
             return true;
 
-        } catch (Exception e) {
-            throw  new NoSuchEntityException("Tokin is not valid");// TODO
+        } catch (AuthDateException e) {
+            throw  new AuthDateException("message.jwt.valid.token");
         }
+
     }
 
     public boolean validateAccessToken(@NonNull String accessToken) {

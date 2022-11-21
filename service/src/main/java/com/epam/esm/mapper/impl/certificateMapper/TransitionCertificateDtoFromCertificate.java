@@ -3,7 +3,6 @@ package com.epam.esm.mapper.impl.certificateMapper;
 
 import com.epam.esm.dto.certificateDto.CertificateDto;
 import com.epam.esm.entity.Certificate;
-
 import com.epam.esm.mapper.Mapper;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +25,9 @@ public class TransitionCertificateDtoFromCertificate implements Mapper<Certifica
         );
     }
 
-    public List<CertificateDto> buildListCertificateDto(List<Certificate> certificates){
+    public List<CertificateDto> buildListCertificateDto(List<Certificate> certificates) {
         List<CertificateDto> list = new ArrayList<>();
-        for(Certificate c : certificates){
+        for (Certificate c : certificates) {
             CertificateDto cd = CertificateDto.builder()
                     .id(c.getId())
                     .certificateName(c.getCertificateName())

@@ -10,8 +10,8 @@ public class IsValidUser {
     public boolean isValidId(Long id){
         JwtAuthentication authentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
          boolean result = false;
-         if (authentication.getRoles().contains(Role.ADMIN) &&
-                 authentication.getRoles().contains(Role.USER) || authentication.getId().equals(id)) {
+         if (authentication.getRoles().contains(Role.ADMIN) ||
+                 authentication.getRoles().contains(Role.USER) && authentication.getId().equals(id)) {
              result = true;
          }
          return result;
@@ -19,8 +19,8 @@ public class IsValidUser {
     public boolean isValidName(String name){
         JwtAuthentication authentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
          boolean result = false;
-         if (authentication.getRoles().contains(Role.ADMIN) &&
-                 authentication.getRoles().contains(Role.USER) || authentication.getUsername().equals(name)) {
+         if (authentication.getRoles().contains(Role.ADMIN) ||
+                 authentication.getRoles().contains(Role.USER) && authentication.getUsername().equals(name)) {
              result = true;
          }
          return result;

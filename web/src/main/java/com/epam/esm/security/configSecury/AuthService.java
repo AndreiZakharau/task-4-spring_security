@@ -1,6 +1,7 @@
 package com.epam.esm.security.configSecury;
 
 import com.epam.esm.entity.User;
+import com.epam.esm.exception.AuthDateException;
 import com.epam.esm.security.filter.TokenValidator;
 import com.epam.esm.security.model.JwtRequest;
 import com.epam.esm.security.model.JwtResponse;
@@ -14,9 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.message.AuthException;
-
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -27,7 +25,7 @@ public class AuthService {
     private final TokenValidator validator;
     private final PasswordEncoder passwordEncoder;
 
-    public JwtResponse userName(@NonNull JwtRequest authRequest) throws AuthException {
+    public JwtResponse userName(@NonNull JwtRequest authRequest) throws AuthDateException {
         User user = userService.findByName(authRequest.getUsername());
         if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
             String accessToken = jwtProvider.generateAccessToken(user);
@@ -35,11 +33,11 @@ public class AuthService {
             refreshStorage.put(user.getNickName(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Is not valid password");
+            throw new AuthDateException("message.password.not.valid");
         }
     }
 
-    public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
+    public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthDateException {
         if (validator.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String userName = claims.getSubject();
@@ -53,7 +51,7 @@ public class AuthService {
             return new JwtResponse(null, null);
     }
 
-    public JwtResponse refresh(@NonNull String refreshToken) throws AuthException {
+    public JwtResponse refresh(@NonNull String refreshToken) throws AuthDateException {
         if (validator.validateRefreshToken(refreshToken)) {
             Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             String userName = claims.getSubject();
@@ -66,7 +64,7 @@ public class AuthService {
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
-        throw new AuthException("JWT token is not valid!"); //todo
+        throw new AuthDateException("message.jwt.valid.token");
     }
 
     @Bean

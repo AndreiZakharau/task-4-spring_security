@@ -24,8 +24,15 @@ public interface TagRepository extends JpaRepository<Tag,Long> {
             "group by t.tag_name) as count_tags on count_tags.tag = tags.tag_name " +
             "having max(count_tags.count_tag) ";
 
+    /**
+     * @param tagName the tagName
+     * @return tag by name
+     */
     Optional<Tag> findByTagName(String tagName);
 
+    /**
+     * @return the most widely used tag of a user with the highest cost of all orders
+     */
     @Query( value = GET_POPULAR_TAG, nativeQuery = true)
     Tag getPopularTagWithUser();
 }

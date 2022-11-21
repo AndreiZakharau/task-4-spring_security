@@ -103,7 +103,8 @@ public class CertificateServiceImpl implements CertificateService {
                 throw new IncorrectDataException(languageMassage.getMessage("message.not.valid"));
             }
         } else {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return certificateDtoFromCertificate.mapFrom(certificate1);
     }
@@ -113,7 +114,8 @@ public class CertificateServiceImpl implements CertificateService {
     public Optional<ReadCertificate> findById(long id) {
         Optional<Certificate> c = repository.findById(id);
         if (c.isEmpty()) {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return c.map(readMapper::mapFrom);
     }
@@ -125,7 +127,8 @@ public class CertificateServiceImpl implements CertificateService {
         if (c.isPresent()) {
             repository.delete(c.get());
         } else {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.certificate.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
     }
 
@@ -149,7 +152,7 @@ public class CertificateServiceImpl implements CertificateService {
             sortParameters = new SortParamsContext(sortColumns, orderTypes);
 
             if (!certificateValidator.columnsValid(sortParameters)) {
-                throw new NoSuchEntityException("bad parameters"); //todo
+                throw new NoSuchEntityException(languageMassage.getMessage("message.bad.parameters"));
             } else {
                 List<String> orderTypesList = sortParameters.getOrderTypes();
                 for (String column : sortColumns) {

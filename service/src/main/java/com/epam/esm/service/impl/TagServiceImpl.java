@@ -80,7 +80,8 @@ public class TagServiceImpl implements TagService {
                 throw new IncorrectDataException(languageMassage.getMessage("message.not.valid"));
             }
         } else {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return tagDtoFromTag.mapFrom(tag1);
     }
@@ -98,7 +99,8 @@ public class TagServiceImpl implements TagService {
     public Optional<ReadTag> findById(long id) {
         Optional<Tag> tag = Optional.of(tagRepository.findById(id)).orElseThrow();
         if (tag.isEmpty()) {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
         return tag.map(readMapper::mapFrom);
     }
@@ -109,7 +111,8 @@ public class TagServiceImpl implements TagService {
         if (tagRepository.findById(id).isPresent()) {
             tagRepository.deleteById(id);
         } else {
-            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id"));
+            throw new NoSuchEntityException(languageMassage.getMessage("message.tag.with.id") + id +
+                    languageMassage.getMessage("message.does.not"));
         }
     }
 

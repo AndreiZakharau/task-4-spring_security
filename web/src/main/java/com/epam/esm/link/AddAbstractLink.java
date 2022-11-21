@@ -25,8 +25,8 @@ public abstract class AddAbstractLink <T extends RepresentationModel<T>> impleme
 
     protected void pageLink(Class<?> controllerClass,T dto){
 
-       dto.add(linkTo(methodOn(controllerClass)).withRel("prev"));
-        dto.add(linkTo(methodOn(controllerClass)).withRel("next"));
+       dto.add(linkTo(methodOn(controllerClass)).withRel(PREV_LINK));
+        dto.add(linkTo(methodOn(controllerClass)).withRel(NEXT_LINK));
     }
 }
 

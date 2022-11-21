@@ -9,5 +9,9 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
+    /**
+     * @param nickName the nickName
+     * @return User
+     */
     User findUserByNickName(String nickName);
 }
