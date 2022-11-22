@@ -18,7 +18,12 @@ public class CertificateValidator implements Validator<Certificate> {
 
     private static final int MIN_LETTERS = 2;
     private static final int MAX_LETTERS = 120;
-    private static final String TEXT_PATTERN = "[^\s]+[A-Za-z0-9-\s'\"-.]*";//"[^\s]+[A-Za-zА-я0-9-\s'\"-.]*" посде добовления русского
+
+    /*
+    if Russian letters are required
+    private static final String TEXT_PATTERN ="[^\s]+[A-Za-zА-я0-9-\s'\"-.]*"
+     */
+    private static final String TEXT_PATTERN = "[^\s]+[A-Za-z0-9-\s'\"-.]*";
     private static final List<String> ORDER_TYPES = Arrays.asList("ASC", "DESC");
     private static final List<String> CERTIFICATE_FIELD_NAMES = new ArrayList<>();
 

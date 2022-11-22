@@ -4,6 +4,7 @@ import com.epam.esm.entity.Role;
 import com.epam.esm.security.configSecury.JwtAuthentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
 @Component
 public class IsValidUser {
 

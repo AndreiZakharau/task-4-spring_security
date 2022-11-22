@@ -16,8 +16,8 @@ public class UserValidator implements Validator<User> {
     }
 
     public boolean isPresent(User user){
-        if(user.getNickName().isEmpty() && user.getEmail().isEmpty()
-        && user.getPassword().isEmpty()){
+        if(user.getNickName().isEmpty() || user.getEmail().isEmpty()
+        || user.getPassword().isEmpty()){
             return false;
         } else {
             return true;

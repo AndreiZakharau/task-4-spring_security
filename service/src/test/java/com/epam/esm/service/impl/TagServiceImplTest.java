@@ -2,8 +2,6 @@ package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.tagDto.CreateTag;
 import com.epam.esm.dto.tagDto.ReadTag;
-import com.epam.esm.dto.tagDto.TagDto;
-import com.epam.esm.entity.Certificate;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.mapper.impl.tagMapper.TransitionReadTagFromTag;
 import com.epam.esm.mapper.impl.tagMapper.TransitionTagDtoFromTag;
@@ -21,16 +19,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

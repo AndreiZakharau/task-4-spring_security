@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 @Service("tagsValidator")
 public class TagsValidator implements Validator<Tag> {
 
-    private static final String TEXT_PATTERN = "[^\s]+[A-Za-z0-9-\s'\"-.]*"; //"[^\s]+[A-Za-zА-я0-9-\s'\"-.]*" посде добовления русского
+    private static final int MIN_LETTERS = 2;
+    private static final int MAX_LETTERS = 60;
+
+    private static final String TEXT_PATTERN = "[^\s]+[A-Za-z0-9-\s'\"-.]*";
 
     @Override
     public boolean isValid(Tag tag) {
@@ -18,7 +21,7 @@ public class TagsValidator implements Validator<Tag> {
         if (name == null) {
             return false;
         } else
-            return name.length() >= 2 && name.length() <= 60 && name.matches(TEXT_PATTERN);
+            return name.length() >= MIN_LETTERS && name.length() <= MAX_LETTERS && name.matches(TEXT_PATTERN);
     }
 
     public boolean isValidModel(Tag tag) {

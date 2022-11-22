@@ -39,7 +39,7 @@ public class AddCertificateLink extends AddAbstractLink<ReadCertificate> {
         linkTo(CertificateController.class, certificateDto, id, SELF_LINK, UPDATE_LINK, DELETE_LINK);
     }
 
-//    @Override
+
     public void pageLink(Page listPage, ReadCertificate readCertificate) {
         int totalRecords = listPage.getTotalPages();
         int pages = Pagination.findPages(totalRecords, listPage.getSize());

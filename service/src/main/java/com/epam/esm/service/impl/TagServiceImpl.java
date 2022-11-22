@@ -75,7 +75,7 @@ public class TagServiceImpl implements TagService {
         if (tag.isPresent()) {
             tag.get().setTagName(tagDto.getTagName());
             if (tagsValidator.isValidModel(tagFromTagDto.mapFrom(tagDto))) {
-             tag1 = tagRepository.saveAndFlush(tag.get());
+                tag1 = tagRepository.saveAndFlush(tag.get());
             } else {
                 throw new IncorrectDataException(languageMassage.getMessage("message.not.valid"));
             }
@@ -85,7 +85,6 @@ public class TagServiceImpl implements TagService {
         }
         return tagDtoFromTag.mapFrom(tag1);
     }
-
 
 
     @Override

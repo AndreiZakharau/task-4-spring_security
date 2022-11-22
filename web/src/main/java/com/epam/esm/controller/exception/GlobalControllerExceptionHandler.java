@@ -4,7 +4,6 @@ import com.epam.esm.exception.AuthDateException;
 import com.epam.esm.exception.IncorrectDataException;
 import com.epam.esm.exception.ModelException;
 import com.epam.esm.exception.NoSuchEntityException;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -17,10 +16,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.security.auth.message.AuthException;
+
 import java.util.Locale;
 
-@RestControllerAdvice()
+@RestControllerAdvice
 public class GlobalControllerExceptionHandler {
 
     @Autowired

@@ -1,7 +1,6 @@
 package com.epam.esm.security.filter;
 
 import com.epam.esm.exception.AuthDateException;
-import com.epam.esm.exception.NoSuchEntityException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

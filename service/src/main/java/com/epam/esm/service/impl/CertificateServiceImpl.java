@@ -42,7 +42,6 @@ public class CertificateServiceImpl implements CertificateService {
     private final TransitionReadCertificateFromCertificate readMapper;
     private final TransitionCertificateFromCertificateDto certificateFromCertificateDto;
     private final TransitionCertificateFromCreateCertificate certificateFromCreateCertificate;
-
     private final TransitionCertificateDtoFromCertificate certificateDtoFromCertificate;
     private final LanguageMassage languageMassage;
 
@@ -145,6 +144,32 @@ public class CertificateServiceImpl implements CertificateService {
             String certificateName, List<String> tagNames, String description, List<Double> prices,
             List<String> sortColumns, List<String> orderTypes, int page, int size) {
 
+        if (certificateName != null) {
+            certificateName = "%" + certificateName + "%";
+        }
+        if (description != null) {
+            description = "%" + description + "%";
+        }
+        List<Tag> tags = new ArrayList<>();
+        if (!tagNames.isEmpty()) {
+            for (String name : tagNames) {
+                Tag tag = tagRepository.findByTagName(name).orElseThrow();
+                tags.add(tag);
+            }
+        }
+
+        Sort sort = getSort(sortColumns, orderTypes);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        double minPrice = getMinPrise(prices);
+        double maxPrice = getMaxPrise(prices);
+        Page<Certificate> list = repository.findAllDistinctByCertificateNameLikeOrDescriptionLikeOrPriceBetweenOrTagsIn(
+                certificateName, description, minPrice, maxPrice, tags, pageable);
+
+        return list.map(readMapper::mapFrom);
+    }
+
+    private Sort getSort(List<String> sortColumns, List<String> orderTypes) {
+
         List<String> typesList = Arrays.asList("ASC", "DESC");
         Sort sort = null;
         SortParamsContext sortParameters;
@@ -167,37 +192,26 @@ public class CertificateServiceImpl implements CertificateService {
                 }
             }
         }
+        return sort;
+    }
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        if (certificateName != null) {
-            certificateName = "%" + certificateName + "%";
-        }
-        if (description != null) {
-            description = "%" + description + "%";
-        }
-        List<Tag> tags = new ArrayList<>();
-        if (!tagNames.isEmpty()) {
-            for (String name : tagNames) {
-                Tag tag = tagRepository.findByTagName(name).orElseThrow();
-                tags.add(tag);
-            }
-        }
-
+    private double getMinPrise(List<Double> prices) {
         double minPrice = 0;
-        double maxPrice = 0;
         if (prices != null) {
-            maxPrice = prices.stream().mapToDouble(price -> price)
-                    .max().orElseThrow();
             minPrice = prices.stream().mapToDouble(price -> price)
                     .min().orElseThrow();
         }
 
-        Page<Certificate> list = repository.findAllDistinctByCertificateNameLikeOrDescriptionLikeOrPriceBetweenOrTagsIn(
-                certificateName, description, minPrice, maxPrice, tags, pageable);
-
-        return list.map(readMapper::mapFrom);
+        return minPrice;
     }
 
+    private double getMaxPrise(List<Double> prices) {
+        double maxPrice = 0;
+        if (prices != null) {
+            maxPrice = prices.stream().mapToDouble(price -> price)
+                    .max().orElseThrow();
+        }
+        return maxPrice;
+    }
 }
 
