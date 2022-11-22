@@ -32,6 +32,6 @@ public class TagsValidator implements Validator<Tag> {
         if (name == null) {
             return false;
         } else
-            return name.length() >= 2 && name.length() <= 60 && name.matches(TEXT_PATTERN);
+            return name.length() >= MIN_LETTERS && name.length() <= MAX_LETTERS && name.matches(TEXT_PATTERN);
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UserServiceImpl userService;
-    private final RedisCache<String, String> refreshStorage ;
+    private final RedisCache<String, String> refreshStorage;
     private final JwtProvider jwtProvider;
     private final TokenValidator validator;
     private final PasswordEncoder passwordEncoder;
@@ -48,7 +48,7 @@ public class AuthService {
                 return new JwtResponse(accessToken, null);
             }
         }
-            return new JwtResponse(null, null);
+        return new JwtResponse(null, null);
     }
 
     public JwtResponse refresh(@NonNull String refreshToken) throws AuthDateException {
