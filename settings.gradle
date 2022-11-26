@@ -1,0 +1,5 @@
+rootProject.name = 'task_4_spring_security'
+
+include 'persistence'
+include 'service'
+include 'web'
